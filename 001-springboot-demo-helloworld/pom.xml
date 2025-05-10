@@ -28,6 +28,7 @@
 
 
     <build>
+        <finalName>001-springboot-demo-helloworld</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
