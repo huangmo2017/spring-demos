@@ -1,0 +1,35 @@
+server:
+  port: 8091
+spring:
+  application:
+    name: myapp
+  cloud:
+    vault:
+      host: 192.168.42.113
+      port: 8200
+      scheme: http
+      enabled: true
+      uri: http://192.168.42.113:8200
+      authentication: token
+      token: myroot
+      kv:
+        enabled: true
+        backend: secret
+        application-name: myapp
+        default-context: myapp
+
+  datasource:
+    url: jdbc:postgresql://192.168.42.113:5432/demo
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+
+logging:
+  level:
+    com.hdm: DEBUG
+    org.springframework.vault: DEBUG
