@@ -26,7 +26,6 @@ pipeline {
         stage('Debug - Check Files') {
             steps {
                 sh 'ls -la'
-                sh 'ls -la ./target/'
                 sh 'cat ./001-springboot-demo-helloworld/Dockerfile'
             }
         }
