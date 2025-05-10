@@ -1,5 +1,5 @@
 pipeline {
-    agent any
+    agent none
 
     environment {
         // 设置 Docker 和 kubectl 的路径，根据你的Jenkins环境调整
@@ -26,6 +26,7 @@ pipeline {
         }
 
         stage('Build Docker Image') {
+            agent { label 'docker-capable' }
             steps {
                 script {
                     // 指定 Dockerfile 的路径和构建上下文路径
