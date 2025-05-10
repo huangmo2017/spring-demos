@@ -10,7 +10,7 @@ pipeline {
         // 📦 阶段一：拉取代码
         stage('Checkout') {
             steps {
-                git branch: 'main',
+                git branch: 'master',
                         url: 'https://github.com/huangmo2017/spring-demos.git',
                         credentialsId: 'github-token'  // 替换为你在Jenkins中配置的凭据ID
             }
