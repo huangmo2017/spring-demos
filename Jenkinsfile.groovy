@@ -9,7 +9,6 @@ pipeline {
     }
 
     stages {
-        // 阶段一：拉取代码
         stage('Checkout') {
             steps {
                 git branch: 'master',
@@ -18,7 +17,6 @@ pipeline {
             }
         }
 
-        // 阶段二：Maven 构建
         stage('Build with Maven') {
             steps {
                 withMaven(maven: 'M3') {
@@ -27,17 +25,11 @@ pipeline {
             }
         }
 
-        //阶段三：可选 - 展示构建结果或归档文件
-        stage('Archive JAR') {
-            steps {
-                archiveArtifacts artifacts: '001-springboot-demo-helloworld/target/*.jar'
-            }
-        }
-
         stage('Build Docker Image') {
             steps {
                 script {
-                    docker.build(DOCKER_IMAGE, './001-springboot-demo-helloworld')
+                    // 指定 Dockerfile 的路径和构建上下文路径
+                    docker.build(DOCKER_IMAGE, "-f ./001-springboot-demo-helloworld/docker/Dockerfile ./001-springboot-demo-helloworld")
                 }
             }
         }
