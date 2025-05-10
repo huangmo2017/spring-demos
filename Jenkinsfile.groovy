@@ -1,5 +1,5 @@
 pipeline {
-    agent any
+    agent { label 'docker-capable' }
 
     environment {
         // 设置 Docker 和 kubectl 的路径，根据你的Jenkins环境调整
