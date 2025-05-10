@@ -29,7 +29,7 @@ pipeline {
             steps {
                 script {
                     // 指定 Dockerfile 的路径和构建上下文路径
-                    docker.build(DOCKER_IMAGE, "-f ./001-springboot-demo-helloworld/docker/Dockerfile ./001-springboot-demo-helloworld")
+                    docker.build(DOCKER_IMAGE, "-f ./001-springboot-demo-helloworld/Dockerfile ./001-springboot-demo-helloworld")
                 }
             }
         }
