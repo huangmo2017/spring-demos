@@ -5,6 +5,7 @@ pipeline {
         PATH = "/usr/local/bin:${env.PATH}"
         DOCKER_IMAGE = "huangmo2017/001-springboot-demo-helloworld:${env.BUILD_NUMBER}"
         DOCKER_CREDENTIALS_ID = 'docker_hub_huangmo2017' // 确保已在Jenkins中添加了Docker Hub的凭证
+        KUBECONFIG = credentials('k8s-config') // 引用之前设置的kubeconfig凭证
     }
 
     stages {
@@ -44,6 +45,19 @@ pipeline {
                 script {
                     docker.withRegistry('https://registry.hub.docker.com', DOCKER_CREDENTIALS_ID) {
                         //docker.image(DOCKER_IMAGE).push()
+                    }
+                }
+            }
+        }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                steps {
+                    script {
+                        sh """
+                    kubectl apply -f helloworld-deployment.yaml
+                    kubectl apply -f helloworld-service.yaml
+                    """
                     }
                 }
             }

@@ -18,8 +18,8 @@ public class SecretService {
     }
 
     public String getSecretPassword() {
-        VaultResponse read = vaultOperations.read("secret/data/myapp");
+        VaultResponse read = vaultOperations.read("secret/data/helloworld");
         Map<String, Object> data = read.getData();
-        return vaultOperations.read("secret/data/myapp").getData().get("data").toString();
+        return vaultOperations.read("secret/data/helloworld").getData().get("data").toString();
     }
 }

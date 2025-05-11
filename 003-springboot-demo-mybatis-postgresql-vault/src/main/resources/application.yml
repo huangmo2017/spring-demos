@@ -2,7 +2,7 @@ server:
   port: 8091
 spring:
   application:
-    name: myapp
+    name: helloworld
   cloud:
     vault:
       host: 192.168.42.113
@@ -15,8 +15,8 @@ spring:
       kv:
         enabled: true
         backend: secret
-        application-name: myapp
-        default-context: myapp
+        application-name: helloworld
+        default-context: helloworld
 
   datasource:
     url: jdbc:postgresql://192.168.42.113:5432/demo
