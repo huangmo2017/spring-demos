@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         PATH = "/usr/local/bin:${env.PATH}"
-        DOCKER_IMAGE = "huangmo2017/001-springboot-demo-helloworld:${env.BUILD_NUMBER}"
+        DOCKER_IMAGE = "192.168.42.113:5000/001-springboot-demo-helloworld:${env.BUILD_NUMBER}"
         DOCKER_CREDENTIALS_ID = 'docker_hub_huangmo2017' // 确保已在Jenkins中添加了Docker Hub的凭证
         KUBECONFIG = credentials('k8s-config') // 引用之前设置的kubeconfig凭证
     }
@@ -43,8 +43,8 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 script {
-                    docker.withRegistry('https://registry.hub.docker.com', DOCKER_CREDENTIALS_ID) {
-                        //docker.image(DOCKER_IMAGE).push()
+                    docker.withRegistry('http://192.168.42.113:5000/v2/', DOCKER_CREDENTIALS_ID) {
+                        docker.image(DOCKER_IMAGE).push()
                     }
                 }
             }
