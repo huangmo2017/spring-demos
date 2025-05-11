@@ -3,7 +3,8 @@ pipeline {
 
     environment {
         PATH = "/usr/local/bin:${env.PATH}"
-        DOCKER_IMAGE = "test/001-springboot-demo-helloworld:${env.BUILD_NUMBER}"
+        DOCKER_IMAGE = "huangmo2017/001-springboot-demo-helloworld:${env.BUILD_NUMBER}"
+        DOCKER_CREDENTIALS_ID = 'docker_hub_huangmo2017' // 确保已在Jenkins中添加了Docker Hub的凭证
     }
 
     stages {
@@ -34,6 +35,16 @@ pipeline {
             steps {
                 script {
                     docker.build(DOCKER_IMAGE, "-f ./001-springboot-demo-helloworld/Dockerfile .")
+                }
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                script {
+                    docker.withRegistry('https://registry.hub.docker.com', DOCKER_CREDENTIALS_ID) {
+                        docker.image(DOCKER_IMAGE).push()
+                    }
                 }
             }
         }
