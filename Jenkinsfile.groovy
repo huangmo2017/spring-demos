@@ -1,5 +1,5 @@
 pipeline {
-    agent { label 'docker-capable' }
+    agent { label 'k8s-node' }
 
     environment {
         PATH = "/usr/local/bin:${env.PATH}"
