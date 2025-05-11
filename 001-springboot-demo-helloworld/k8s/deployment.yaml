@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: helloworld-deployment
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: helloworld
@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
         - name: helloworld-container
-          image: huangmo2017/001-springboot-demo-helloworld:20 # 替换为你的镜像名和标签
+          image: huangmo2017/001-springboot-demo-helloworld:${BUILD_NUMBER} # 替换为你的镜像名和标签
           ports:
             - containerPort: 8091

@@ -7,11 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * @Description
- * @Author HDM
- * @Date 2025-04-05 下午5:59
- */
+
 @SpringBootApplication
 @RestController
 public class HelloWorldApplication {
@@ -27,6 +23,6 @@ public class HelloWorldApplication {
      */
     @GetMapping("/hello")
     public ResponseEntity<String> hello() {
-        return new ResponseEntity<>("hello world", HttpStatus.OK);
+        return new ResponseEntity<>("hello world2", HttpStatus.OK);
     }
 }

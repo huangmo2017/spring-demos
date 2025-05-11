@@ -52,8 +52,15 @@ pipeline {
 
         stage('Deploy to Kubernetes') {
             steps {
-                sh """
+/*                sh """
                     kubectl apply -f ./001-springboot-demo-helloworld/k8s/deployment.yaml
+                    kubectl apply -f ./001-springboot-demo-helloworld/k8s/service.yaml
+                    """*/
+
+                sh """
+                    export BUILD_NUMBER=${env.BUILD_NUMBER}
+                    envsubst < ./001-springboot-demo-helloworld/k8s/deployment.yaml > ./001-springboot-demo-helloworld/k8s/deployment-generated.yaml
+                    kubectl apply -f ./001-springboot-demo-helloworld/k8s/deployment-generated.yaml
                     kubectl apply -f ./001-springboot-demo-helloworld/k8s/service.yaml
                     """
             }
