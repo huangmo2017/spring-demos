@@ -53,8 +53,8 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 sh """
-                    kubectl apply -f helloworld-deployment.yaml
-                    kubectl apply -f helloworld-service.yaml
+                    kubectl apply -f ./001-springboot-demo-helloworld/k8s/deployment.yaml
+                    kubectl apply -f ./001-springboot-demo-helloworld/k8s/service.yaml
                     """
             }
         }
