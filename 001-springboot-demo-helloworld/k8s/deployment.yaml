@@ -16,4 +16,4 @@ spec:
         - name: helloworld-container
           image: huangmo2017/001-springboot-demo-helloworld:20 # 替换为你的镜像名和标签
           ports:
-            - containerPort: 8080
+            - containerPort: 8091
