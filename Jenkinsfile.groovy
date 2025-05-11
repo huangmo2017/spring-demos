@@ -52,12 +52,10 @@ pipeline {
 
         stage('Deploy to Kubernetes') {
             steps {
-                steps {
-                    sh """
+                sh """
                     kubectl apply -f helloworld-deployment.yaml
                     kubectl apply -f helloworld-service.yaml
                     """
-                }
             }
         }
     }
