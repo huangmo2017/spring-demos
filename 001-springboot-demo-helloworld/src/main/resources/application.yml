@@ -7,5 +7,5 @@ server:
     key-store-password: changeit
     keyStoreType: JKS
     keyAlias: tomcat
-    trust-store: classpath:truststore.jks
-    trust-store-password: changeit
+    trust-store: classpath:truststore.p12
+    trust-store-password: yourpassword

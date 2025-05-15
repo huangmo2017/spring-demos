@@ -3,7 +3,7 @@ kind: Ingress
 metadata:
   name: helloworld-ingress
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
 spec:
   tls:
     - hosts:
