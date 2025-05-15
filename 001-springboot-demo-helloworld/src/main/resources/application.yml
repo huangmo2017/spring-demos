@@ -1,9 +1,9 @@
 server:
-  port: 8091
+  port: 8443
   ssl:
     enabled: false
     client-auth: none
-    key-store: classpath:server.p12
+    key-store: classpath:keystore.p12
     key-store-password: changeit
     keyStoreType: JKS
     keyAlias: tomcat

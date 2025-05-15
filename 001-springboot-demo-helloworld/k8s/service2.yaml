@@ -7,5 +7,5 @@ spec:
     app: helloworld
   ports:
     - protocol: TCP
-      port: 443 # 前端访问的端口
-      targetPort: 8443 # Spring Boot 应用监听的端口
+      port: 80
+      targetPort: 8091
