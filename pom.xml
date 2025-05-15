@@ -9,9 +9,11 @@
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <modules>
+        <module>001-springboot-demo-basic</module>
         <module>001-springboot-demo-helloworld</module>
         <module>002-springboot-demo-mybatis-postgresql</module>
         <module>003-springboot-demo-mybatis-postgresql-vault</module>
+        <module>004-springboot-demo-auth</module>
     </modules>
 
     <properties>

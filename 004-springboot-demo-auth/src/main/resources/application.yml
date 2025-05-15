@@ -9,3 +9,5 @@ server:
     keyAlias: tomcat
     trust-store: classpath:truststore.jks
     trust-store-password: changeit
+
+

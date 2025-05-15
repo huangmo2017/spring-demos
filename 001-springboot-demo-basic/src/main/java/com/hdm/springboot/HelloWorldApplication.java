@@ -23,6 +23,6 @@ public class HelloWorldApplication {
      */
     @GetMapping("/hello")
     public ResponseEntity<String> hello() {
-        return new ResponseEntity<>("hello world2", HttpStatus.OK);
+        return new ResponseEntity<>("hello world", HttpStatus.OK);
     }
 }
