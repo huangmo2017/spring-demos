@@ -1,8 +1,8 @@
 server:
   port: 8091
   ssl:
-    enabled: true
-    client-auth: need
+    enabled: false
+    client-auth: none
     key-store: classpath:server.p12
     key-store-password: changeit
     keyStoreType: JKS
