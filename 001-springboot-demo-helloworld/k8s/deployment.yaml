@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: helloworld-deployment
+  name: helloworld-service
 spec:
   replicas: 1
   selector:
@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
         - name: helloworld-container
-          image: 192.168.42.113:5000/001-springboot-demo-helloworld:36 # 替换为你的镜像名和标签
+          image: 192.168.42.113:5000/001-springboot-demo-helloworld:${BUILD_NUMBER} # 替换为你的镜像名和标签
           ports:
-            - containerPort: 8091
+            - containerPort: 8443
