@@ -1,0 +1,8 @@
+server:
+  port: 8443
+  ssl:
+    key-store: classpath:cert/server.p12
+    key-store-password: changeit   # 对应你设置的密码
+    key-store-type: PKCS12
+    key-alias: server
+    client-auth: need  # 启用双向认证

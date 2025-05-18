@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: helloworld-container
-          image: 192.168.42.113:5000/001-springboot-demo-helloworld:45
+          image: 192.168.42.113:5000/001-springboot-demo-helloworld:46
           args: ["--server.ssl.client-auth=need"]
           ports:
             - containerPort: 8443
