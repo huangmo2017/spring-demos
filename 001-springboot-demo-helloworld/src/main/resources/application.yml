@@ -3,9 +3,9 @@ server:
   ssl:
     enabled: true
     client-auth: need
-    key-store: classpath:keystore.p12
+    key-store: classpath:cert/server.p12
     key-store-password: changeit
     keyStoreType: JKS
-    keyAlias: tomcat
-    trust-store: classpath:truststore.p12
-    trust-store-password: yourpassword
+    #keyAlias: tomcat
+    trust-store: classpath:cert/truststore.jks
+    trust-store-password: changeit
