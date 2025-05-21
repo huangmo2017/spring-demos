@@ -5,8 +5,14 @@ metadata:
   annotations:
     nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
     nginx.ingress.kubernetes.io/auth-tls-verify-client: "on"
-    nginx.ingress.kubernetes.io/auth-tls-secret: "default/client-tls-secret"
+    nginx.ingress.kubernetes.io/auth-tls-pass-certificate-to-upstream: "false"
+    nginx.ingress.kubernetes.io/auth-tls-verify-depth: "1"
+    nginx.ingress.kubernetes.io/auth-tls-secret: "default/ca-secret"
 spec:
+  tls:
+    - hosts:
+        - 192.168.42.111
+      secretName: springboot-tls
   rules:
     - http:
         paths:

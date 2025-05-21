@@ -14,6 +14,7 @@
         <module>002-springboot-demo-mybatis-postgresql</module>
         <module>003-springboot-demo-mybatis-postgresql-vault</module>
         <module>004-springboot-demo-auth</module>
+        <module>005-springboot-demo-restTemplate</module>
     </modules>
 
     <properties>
