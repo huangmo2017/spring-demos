@@ -1,0 +1,7 @@
+keytool -genkeypair -alias myssl -keyalg RSA -keysize 2048 -storetype PKCS12 -keystore myssl.p12 -validity 3650 -ext san=dns:localhost,ip:127.0.0.1
+
+What is your first and last name?
+  [Unknown]:  localhost
+
+
+  keytool -exportcert -alias myssl -file myssl.crt -keystore myssl.p12 -storetype PKCS12
