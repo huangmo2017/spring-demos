@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: helloworld-container
-          image: huangmo2017/001-springboot-demo-helloworld:${BUILD_NUMBER}
+          image: 192.168.42.113:5000/001-springboot-demo-helloworld:${BUILD_NUMBER} # 替换为你的镜像名和标签
           args: ["--server.ssl.client-auth=none"]
           ports:
             - containerPort: 8443
