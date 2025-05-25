@@ -20,13 +20,13 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: helloworld-service
+                name: helloworld-service-app1
                 port:
                   number: 443
           - path: /app2
             pathType: Prefix
             backend:
               service:
-                name: helloworld-service
+                name: helloworld-service-app2
                 port:
                   number: 443
