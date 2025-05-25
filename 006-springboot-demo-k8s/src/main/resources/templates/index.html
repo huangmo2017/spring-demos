@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>Kubernetes Explorer</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                padding: 20px;
+            }
+
+            h1 {
+                color: #333;
+            }
+
+            select {
+                padding: 5px;
+                font-size: 16px;
+            }
+
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 20px;
+            }
+
+            th, td {
+                text-align: left;
+                padding: 10px;
+                border-bottom: 1px solid #ddd;
+            }
+
+            th {
+                background-color: #f2f2f2;
+            }
+
+            tr:hover {
+                background-color: #f9f9f9;
+            }
+
+            .search-box {
+                margin-top: 10px;
+            }
+
+            input[type="text"] {
+                padding: 5px;
+                width: 250px;
+                font-size: 14px;
+            }
+        </style>
+    </head>
+    <body>
+
+        <h1>Kubernetes Pod Explorer</h1>
+
+        <!-- 命名空间下拉菜单 -->
+        <form id="namespaceForm">
+            <label for="namespaceSelect">选择命名空间：</label>
+            <select id="namespaceSelect" onchange="updatePodList()">
+                <option th:each="ns : ${namespaces}"
+                        th:value="${ns.metadata.name}"
+                        th:text="${ns.metadata.name}"
+                        th:selected="${ns.metadata.name == currentNamespace}">
+                </option>
+            </select>
+        </form>
+
+        <!-- Pod 搜索框 -->
+        <div class="search-box">
+            <input type="text" id="podSearch" placeholder="输入 Pod 名称过滤..." onkeyup="filterPods()"/>
+        </div>
+
+        <!-- Pod 列表 -->
+        <table border="1" id="podTable">
+            <thead>
+            <tr>
+                <th>Pod 名称</th>
+                <th>状态</th>
+                <th>IP 地址</th>
+                <th>节点名称</th>
+                <th>容器数</th>
+                <th>启动时间</th>
+                <th>标签</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="pod : ${pods}" th:id="'pod-' + ${pod.metadata.uid}">
+                <td th:text="${pod.metadata.name}"></td>
+                <td th:text="${pod.status.phase}"></td>
+                <td th:text="${pod.status.podIP != null ? pod.status.podIP : '-'}"></td>
+                <td th:text="${pod.spec.nodeName}"></td>
+                <td th:text="${pod.spec.containers.size()}"></td>
+                <td class="timestamp-cell" th:text="${pod.metadata.creationTimestamp}"></td>
+                <td>
+                    <pre th:text="${pod.metadata.labels} ?: '-'"></pre>
+                </td>
+                <td>
+                    <a th:href="@{/logs(namespace=${pod.metadata.namespace}, podName=${pod.metadata.name})}">
+                        查看日志
+                    </a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <script>
+            function updatePodList() {
+                const selectedNs = document.getElementById('namespaceSelect').value;
+                window.location.href = '?namespace=' + selectedNs;
+            }
+
+            function filterPods() {
+                const input = document.getElementById("podSearch");
+                const filter = input.value.toLowerCase();
+                const rows = document.querySelectorAll("#podTable tbody tr");
+
+                rows.forEach(row => {
+                    const nameCell = row.cells[0]; // 第一列是 Pod 名称
+                    if (nameCell) {
+                        const txtValue = nameCell.textContent || nameCell.innerText;
+                        row.style.display = txtValue.toLowerCase().indexOf(filter) > -1 ? "" : "none";
+                    }
+                });
+            }
+        </script>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const cells = document.querySelectorAll("td.timestamp-cell");
+                cells.forEach(cell => {
+                    const isoDate = cell.textContent.trim();
+                    if (isoDate) {
+                        const date = new Date(isoDate);
+                        const formatted = date.getFullYear() + '-' +
+                            ('0' + (date.getMonth()+1)).slice(-2) + '-' +
+                            ('0' + date.getDate()).slice(-2) + ' ' +
+                            ('0' + date.getHours()).slice(-2) + ':' +
+                            ('0' + date.getMinutes()).slice(-2) + ':' +
+                            ('0' + date.getSeconds()).slice(-2);
+                        cell.textContent = formatted;
+                    }
+                });
+            });
+        </script>
+
+    </body>
+</html>

@@ -10,13 +10,14 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
-    <artifactId>006-springboot-demo-k8s</artifactId>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
+    <artifactId>000-springboot-demo-tools</artifactId>
 
     <dependencies>
         <dependency>
@@ -55,5 +56,25 @@
             <artifactId>lombok</artifactId>
         </dependency>
     </dependencies>
+
+
+
+
+    <build>
+        <finalName>001-springboot-demo-helloworld</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <title th:text="${pageTitle} ?: 'Kubernetes Explorer'">Kubernetes Explorer</title>
+
+        <!-- 引入 Font Awesome 图标 -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                margin: 0;
+                padding: 0;
+                display: flex;
+                height: 100vh;
+            }
+
+            /* 固定顶部标题栏 */
+            .header {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                background-color: #007bff;
+                color: white;
+                padding: 10px 20px;
+                z-index: 10;
+            }
+
+            .sidebar {
+                width: 250px;
+                background-color: #f4f4f4;
+                padding: 20px;
+                border-right: 1px solid #ddd;
+                margin-top: 60px; /* 避开 header */
+            }
+
+            .sidebar h3 {
+                margin-top: 0;
+            }
+
+            .sidebar ul {
+                list-style-type: none;
+                padding-left: 0;
+            }
+
+            .sidebar li {
+                margin-bottom: 12px;
+            }
+
+            .sidebar a {
+                text-decoration: none;
+                color: #333;
+                font-weight: bold;
+                display: flex;
+                align-items: center;
+                transition: color 0.3s ease;
+            }
+
+            .sidebar a:hover,
+            .sidebar a.active {
+                color: #007bff;
+            }
+
+            .sidebar a i {
+                margin-right: 10px;
+                width: 20px;
+                text-align: center;
+            }
+
+            .content {
+                flex: 1;
+                padding: 20px;
+                overflow-y: auto;
+                margin-top: 60px; /* 避开 header */
+            }
+
+            .loading {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                height: 100px;
+                color: #999;
+                font-size: 16px;
+            }
+
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 20px;
+            }
+
+            th, td {
+                text-align: left;
+                padding: 10px;
+                border-bottom: 1px solid #ddd;
+            }
+
+            tr:hover {
+                background-color: #f9f9f9;
+            }
+        </style>
+    </head>
+    <body>
+
+        <!-- 顶部标题栏 -->
+        <div class="header">
+            <h2 style="margin: 0;">Kubernetes Explorer</h2>
+        </div>
+
+        <!-- 左侧导航栏 -->
+        <div class="sidebar">
+            <h3>工具列表</h3>
+            <ul>
+                <li><a class="active" href="#" onclick="loadTool('/tools/k8s/pod', this)"><i class="fas fa-box"></i> Pod Explorer</a></li>
+                <li><a href="#" onclick="loadTool('/tools/k8s/configmap', this)"><i class="fas fa-stream"></i> ConfigMap Viewer</a></li>
+                <li><a href="#" onclick="loadTool('/tools/k8s/secret', this)"><i class="fas fa-lock"></i> Secret Viewer</a></li>
+                <li><a href="#" onclick="loadTool('/tools/k8s/deployments', this)"><i class="fas fa-shipping-fast"></i> Deployment Manager</a></li>
+                <li><a href="#" onclick="loadTool('/tools/k8s/services', this)"><i class="fas fa-network-wired"></i> Service Inspector</a></li>
+            </ul>
+        </div>
+
+        <!-- 右侧内容区 -->
+        <div class="content" id="toolContentArea">
+            <!-- 默认内容由 Thymeleaf 加载 -->
+            <div th:include="${toolContent} ?: ${'tools/k8s/pod-explorer'}"></div>
+        </div>
+
+        <script>
+            // Ajax 动态加载指定工具内容（带 loading 提示）
+            function loadTool(url, element) {
+                const contentArea = document.getElementById('toolContentArea');
+                const links = document.querySelectorAll('.sidebar a');
+
+                // 移除 active 类
+                links.forEach(link => link.classList.remove('active'));
+                // 为当前点击项添加 active 类
+                element.classList.add('active');
+
+                // 显示加载状态
+                contentArea.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> 加载中...</div>';
+
+                fetch(url + "?fragment")
+                    .then(response => response.text())
+                    .then(html => {
+                        contentArea.innerHTML = html;
+                    })
+                    .catch(err => {
+                        console.error("Failed to load tool:", err);
+                        contentArea.innerHTML = "<p>加载工具失败，请重试。</p>";
+                    });
+            }
+        </script>
+
+        <!-- 原始公共脚本保留 -->
+        <script>
+            function updatePodList() {
+                const selectedNs = document.getElementById('namespaceSelect').value;
+                window.location.href = '?namespace=' + selectedNs;
+            }
+
+            function filterPods() {
+                const input = document.getElementById("podSearch");
+                const filter = input.value.toLowerCase();
+                const rows = document.querySelectorAll("#podTable tbody tr");
+
+                rows.forEach(row => {
+                    const nameCell = row.cells[0];
+                    if (nameCell) {
+                        const txtValue = nameCell.textContent || nameCell.innerText;
+                        row.style.display = txtValue.toLowerCase().indexOf(filter) > -1 ? "" : "none";
+                    }
+                });
+            }
+        </script>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const cells = document.querySelectorAll("td.timestamp-cell");
+                cells.forEach(cell => {
+                    const isoDate = cell.textContent.trim();
+                    if (isoDate) {
+                        const date = new Date(isoDate);
+                        const formatted = date.getFullYear() + '-' +
+                            ('0' + (date.getMonth()+1)).slice(-2) + '-' +
+                            ('0' + date.getDate()).slice(-2) + ' ' +
+                            ('0' + date.getHours()).slice(-2) + ':' +
+                            ('0' + date.getMinutes()).slice(-2) + ':' +
+                            ('0' + date.getSeconds()).slice(-2);
+                        cell.textContent = formatted;
+                    }
+                });
+            });
+        </script>
+
+    </body>
+</html>

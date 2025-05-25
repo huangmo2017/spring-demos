@@ -1,0 +1,230 @@
+<!-- src/main/resources/templates/tools/k8s/pod-explorer.html -->
+<div th:fragment="content">
+    <div class="card">
+        <h2 style="margin-top: 0;">
+            <i class="fas fa-box"></i> Kubernetes Pod Explorer
+        </h2>
+
+        <!-- 工具栏：命名空间选择 + 搜索框 -->
+        <div class="toolbar">
+            <form id="namespaceForm" class="form-group">
+                <label for="namespaceSelect">命名空间：</label>
+                <select id="namespaceSelect" onchange="updatePodList()" class="form-control">
+                    <option th:each="ns : ${namespaces}"
+                            th:value="${ns.metadata.name}"
+                            th:text="${ns.metadata.name}"
+                            th:selected="${ns.metadata.name == currentNamespace}">
+                    </option>
+                </select>
+            </form>
+
+            <div class="form-group search-box">
+                <label for="podSearch">过滤 Pod：</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-search input-icon"></i>
+                    <input type="text"
+                           id="podSearch"
+                           placeholder="输入 Pod 名称..."
+                           onkeyup="filterPods()"
+                           class="form-control"/>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pod 列表表格 -->
+        <div class="table-responsive">
+            <table id="podTable" class="styled-table">
+                <thead>
+                <tr>
+                    <th>Pod 名称</th>
+                    <th>状态</th>
+                    <th>IP 地址</th>
+                    <th>节点名称</th>
+                    <th>容器数</th>
+                    <th>启动时间</th>
+                    <th>标签</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="pod : ${pods}" th:id="'pod-' + ${pod.metadata.uid}">
+                    <td th:text="${pod.metadata.name}"></td>
+                    <td>
+                        <span class="status-tag running" th:if="${pod.status.phase == 'Running'}">运行中</span>
+                        <span class="status-tag pending" th:if="${pod.status.phase == 'Pending'}">等待中</span>
+                        <span class="status-tag error" th:if="${pod.status.phase == 'Failed' || pod.status.phase == 'Error'}">失败</span>
+                        <span class="status-tag" th:unless="${pod.status.phase == 'Running' or pod.status.phase == 'Pending' or pod.status.phase == 'Failed' or pod.status.phase == 'Error'}"
+                              th:text="${pod.status.phase} ?: '-'"></span>
+                    </td>
+                    <td th:text="${pod.status.podIP != null ? pod.status.podIP : '-'}"></td>
+                    <td th:text="${pod.spec.nodeName}"></td>
+                    <td th:text="${pod.spec.containers.size()}"></td>
+                    <td class="timestamp-cell" th:text="${pod.metadata.creationTimestamp}"></td>
+                    <td class="labels-cell">
+                        <pre class="labels-content" th:text="${pod.metadata.labels} ?: '-'"></pre>
+                    </td>
+                    <td>
+                        <a th:href="@{/tools/k8s/logs(namespace=${pod.metadata.namespace}, podName=${pod.metadata.name})}"
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           class="btn btn-primary btn-sm">
+                            <i class="fas fa-external-link-alt"></i> 查看日志
+                        </a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* 卡片容器 */
+    .card {
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+
+    /* 工具栏区域 */
+    .toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        min-width: 200px;
+    }
+
+    label {
+        font-size: 14px;
+        margin-bottom: 5px;
+    }
+
+    .form-control {
+        padding: 8px 12px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 14px;
+    }
+
+    select.form-control {
+        height: 34px;
+    }
+
+    .search-box .input-wrapper {
+        position: relative;
+    }
+
+    .search-box .input-icon {
+        position: absolute;
+        left: 10px;
+        top: 10px;
+        color: #999;
+    }
+
+    .search-box input {
+        padding-left: 30px;
+    }
+
+    /* 表格样式 */
+    .table-responsive {
+        overflow-x: auto;
+    }
+
+    .styled-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+        text-align: left;
+    }
+
+    .styled-table thead tr {
+        background-color: #007bff;
+        color: #ffffff;
+        font-weight: bold;
+    }
+
+    .styled-table th,
+    .styled-table td {
+        padding: 12px;
+        border-bottom: 1px solid #ddd;
+        word-break: break-word; /* 新增：允许长单词或URL地址换行 */
+    }
+
+    .styled-table tbody tr:hover {
+        background-color: #f5f5f5;
+    }
+
+    /* 状态标签样式 */
+    .status-tag {
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        color: #fff;
+    }
+
+    .status-tag.running {
+        background-color: #28a745;
+    }
+
+    .status-tag.pending {
+        background-color: #ffc107;
+        color: #333;
+    }
+
+    .status-tag.error {
+        background-color: #dc3545;
+    }
+
+    /* 标签显示样式 */
+    .labels-cell pre {
+        margin: 0;
+        background: #f8f9fa;
+        padding: 6px;
+        border-radius: 4px;
+        font-size: 12px;
+        max-height: 80px;
+        overflow-y: auto;
+        white-space: pre-wrap; /* 允许换行 */
+        word-wrap: break-word; /* 允许长词断开 */
+        max-width: 200px; /* 设置最大宽度 */
+        display: inline-block; /* 使元素成为块级但保持文本内联特性 */
+    }
+
+    /* 按钮样式 */
+    .btn {
+        display: inline-block;
+        padding: 6px 12px;
+        font-size: 13px;
+        font-weight: 500;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: middle;
+        user-select: none;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        color: #fff;
+    }
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+    }
+
+    .btn-sm {
+        padding: 4px 8px;
+        font-size: 12px;
+    }
+</style>
