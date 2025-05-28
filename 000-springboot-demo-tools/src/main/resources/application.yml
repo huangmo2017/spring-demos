@@ -2,3 +2,4 @@ server:
   port: 8090
 kubernetes:
   config-path: C:\Users\86159\.kube\config
+  namespace: all

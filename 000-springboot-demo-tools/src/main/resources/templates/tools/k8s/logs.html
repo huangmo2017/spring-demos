@@ -86,7 +86,7 @@
                 document.getElementById('execCommandText').innerText = command;
 
                 // 构造新的 URL 并跳转
-                window.location.href = `/logs?namespace=${encodeURIComponent(namespace)}&podName=${encodeURIComponent(podName)}&containerName=${encodeURIComponent(selectedContainer)}`;
+                window.location.href = `/tools/k8s/logs?namespace=${encodeURIComponent(namespace)}&podName=${encodeURIComponent(podName)}&containerName=${encodeURIComponent(selectedContainer)}`;
             }
 
             function copyCommand() {

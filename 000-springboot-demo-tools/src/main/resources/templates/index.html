@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
     <head>
         <meta charset="UTF-8">
-        <title th:text="${pageTitle} ?: 'Kubernetes Explorer'">Kubernetes Explorer</title>
+        <title th:text="${pageTitle} ?: 'Tool Explorer'">Tool Explorer</title>
 
         <!-- 引入 Font Awesome 图标 -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -38,15 +38,27 @@
 
             .sidebar h3 {
                 margin-top: 0;
+                cursor: pointer;
+                padding: 5px;
+                border-left: 3px solid transparent;
+                transition: all 0.2s ease;
             }
 
-            .sidebar ul {
+            .sidebar h3:hover {
+                background-color: #e9ecef;
+                border-left-color: #007bff;
+            }
+
+            .tool-group ul {
                 list-style-type: none;
-                padding-left: 0;
+                padding-left: 10px;
+                margin-top: 5px;
+                margin-bottom: 15px;
+                display: none;
             }
 
-            .sidebar li {
-                margin-bottom: 12px;
+            .tool-group.active ul {
+                display: block;
             }
 
             .sidebar a {
@@ -56,11 +68,14 @@
                 display: flex;
                 align-items: center;
                 transition: color 0.3s ease;
+                padding: 5px 10px;
+                border-radius: 4px;
             }
 
             .sidebar a:hover,
             .sidebar a.active {
                 color: #007bff;
+                background-color: #e9ecef;
             }
 
             .sidebar a i {
@@ -106,39 +121,72 @@
 
         <!-- 顶部标题栏 -->
         <div class="header">
-            <h2 style="margin: 0;">Kubernetes Explorer</h2>
+            <h2 style="margin: 0;">Tool Explorer</h2>
         </div>
 
         <!-- 左侧导航栏 -->
         <div class="sidebar">
-            <h3>工具列表</h3>
-            <ul>
-                <li><a class="active" href="#" onclick="loadTool('/tools/k8s/pod', this)"><i class="fas fa-box"></i> Pod Explorer</a></li>
-                <li><a href="#" onclick="loadTool('/tools/k8s/configmap', this)"><i class="fas fa-stream"></i> ConfigMap Viewer</a></li>
-                <li><a href="#" onclick="loadTool('/tools/k8s/secret', this)"><i class="fas fa-lock"></i> Secret Viewer</a></li>
-                <li><a href="#" onclick="loadTool('/tools/k8s/deployments', this)"><i class="fas fa-shipping-fast"></i> Deployment Manager</a></li>
-                <li><a href="#" onclick="loadTool('/tools/k8s/services', this)"><i class="fas fa-network-wired"></i> Service Inspector</a></li>
-            </ul>
+            <!-- Kubernetes 工具组 -->
+            <div class="tool-group active">
+                <h3 onclick="toggleGroup(this)">📘 Kubernetes</h3>
+                <ul>
+                    <li><a class="active" href="#" onclick="loadTool('/tools/k8s/pod', this)"><i class="fas fa-box"></i> Pod Explorer</a></li>
+                    <li><a href="#" onclick="loadTool('/tools/k8s/configmap', this)"><i class="fas fa-stream"></i> ConfigMap Viewer</a></li>
+                    <li><a href="#" onclick="loadTool('/tools/k8s/secret', this)"><i class="fas fa-lock"></i> Secret Viewer</a></li>
+                    <li><a href="#" onclick="loadTool('/tools/k8s/deployments', this)"><i class="fas fa-shipping-fast"></i> Deployment Manager</a></li>
+                    <li><a href="#" onclick="loadTool('/tools/k8s/services', this)"><i class="fas fa-network-wired"></i> Service Inspector</a></li>
+                    <li><a href="#" onclick="loadTool('/tools/k8s/logs', this)"><i class="fas fa-book"></i> Log Viewer (WIP)</a></li>
+                </ul>
+            </div>
+
+            <!-- Docker 工具组 -->
+            <div class="tool-group">
+                <h3 onclick="toggleGroup(this)">🐳 Docker</h3>
+                <ul>
+                    <li><a href="#" onclick="loadTool('/tools/docker/containers', this)"><i class="fas fa-cube"></i> 容器管理</a></li>
+                    <li><a href="#" onclick="loadTool('/tools/docker/images', this)"><i class="fas fa-image"></i> 镜像管理</a></li>
+                </ul>
+            </div>
+
+            <!-- 系统工具组 -->
+            <div class="tool-group">
+                <h3 onclick="toggleGroup(this)">🔧 系统工具</h3>
+                <ul>
+                    <!-- 在系统工具组中加入该工具 -->
+                    <li>
+                        <a href="#" onclick="loadTool('/tools/utils/column-to-csv', this)">
+                            <i class="fas fa-list-ul"></i> 列转逗号字符串
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </div>
 
         <!-- 右侧内容区 -->
         <div class="content" id="toolContentArea">
-            <!-- 默认内容由 Thymeleaf 加载 -->
             <div th:include="${toolContent} ?: ${'tools/k8s/pod-explorer'}"></div>
         </div>
 
         <script>
-            // Ajax 动态加载指定工具内容（带 loading 提示）
+            // 切换工具组展开/收起状态
+            function toggleGroup(header) {
+                const group = header.parentElement;
+                group.classList.toggle("active");
+
+                // 关闭其他已展开的组
+                document.querySelectorAll(".tool-group").forEach(g => {
+                    if (g !== group) g.classList.remove("active");
+                });
+            }
+
+            // Ajax 加载工具内容
             function loadTool(url, element) {
                 const contentArea = document.getElementById('toolContentArea');
                 const links = document.querySelectorAll('.sidebar a');
 
-                // 移除 active 类
                 links.forEach(link => link.classList.remove('active'));
-                // 为当前点击项添加 active 类
                 element.classList.add('active');
 
-                // 显示加载状态
                 contentArea.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> 加载中...</div>';
 
                 fetch(url + "?fragment")
@@ -192,6 +240,64 @@
                     }
                 });
             });
+        </script>
+
+        <script>
+            function convertData() {
+                const input = document.getElementById('inputData').value.trim();
+                const removeDuplicates = document.getElementById('removeDuplicates').checked;
+                const sortItems = document.getElementById('sortItems').checked;
+                const conversionType = document.querySelector('input[name="conversionType"]:checked').value;
+
+                if (conversionType === 'toCSV') {
+                    // 一列 → 逗号字符串
+                    let lines = input.split('\n')
+                        .map(line => line.trim())
+                        .filter(line => line.length > 0);
+
+                    if (removeDuplicates) {
+                        lines = [...new Set(lines)];
+                    }
+
+                    if (sortItems) {
+                        lines.sort((a, b) => {
+                            // 尝试按数字比较，否则按字符串
+                            const numA = parseFloat(a), numB = parseFloat(b);
+                            if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
+                            return a.localeCompare(b);
+                        });
+                    }
+
+                    document.getElementById('outputData').value = lines.join(',');
+                } else {
+                    // 逗号字符串 → 一列
+                    let items = input.split(',')
+                        .map(item => item.trim())
+                        .filter(item => item.length > 0);
+
+                    if (removeDuplicates) {
+                        items = [...new Set(items)];
+                    }
+
+                    if (sortItems) {
+                        items.sort((a, b) => {
+                            const numA = parseFloat(a), numB = parseFloat(b);
+                            if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
+                            return a.localeCompare(b);
+                        });
+                    }
+
+                    document.getElementById('outputData').value = items.join('\n');
+                }
+            }
+
+            function copyToClipboard() {
+                const output = document.getElementById('outputData');
+                output.select();
+                output.setSelectionRange(0, 99999); // For mobile devices
+                document.execCommand("copy");
+                alert("已复制到剪贴板！");
+            }
         </script>
 
     </body>

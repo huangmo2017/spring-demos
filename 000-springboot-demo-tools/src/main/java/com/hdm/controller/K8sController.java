@@ -5,12 +5,14 @@ import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.PodList;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -20,6 +22,10 @@ public class K8sController {
 
     private final KubernetesClient client;
 
+
+    @Value("${kubernetes.namespace}")
+    private String namespaceName;
+
     public K8sController(KubernetesClient client) {
         this.client = client;
     }
@@ -28,7 +34,19 @@ public class K8sController {
     @GetMapping("/pod")
     public String showPodExplorer(@RequestParam(defaultValue = "default") String namespace,
                                   Model model) {
-        List<Namespace> namespaces = client.namespaces().list().getItems();
+
+        List<Namespace> namespaces = new ArrayList<>();
+
+        if ("all".equals(namespaceName)) {
+            namespaces = client.namespaces().list().getItems();
+        } else {
+            Namespace myNamespace = client.namespaces()
+                    .withName(namespaceName)
+                    .get();
+            namespaces.add(myNamespace);
+        }
+
+
         PodList podList = client.pods().inNamespace(namespace).list();
 
         model.addAttribute("namespaces", namespaces);
@@ -45,7 +63,16 @@ public class K8sController {
     @GetMapping(path = "/pod", params = "fragment")
     public String loadPodFragment(@RequestParam(defaultValue = "default") String namespace,
                                   Model model) {
-        List<Namespace> namespaces = client.namespaces().list().getItems();
+        List<Namespace> namespaces = new ArrayList<>();
+
+        if ("all".equals(namespaceName)) {
+            namespaces = client.namespaces().list().getItems();
+        } else {
+            Namespace myNamespace = client.namespaces()
+                    .withName(namespaceName)
+                    .get();
+            namespaces.add(myNamespace);
+        }
         PodList podList = client.pods().inNamespace(namespace).list();
 
         model.addAttribute("namespaces", namespaces);
@@ -88,6 +115,6 @@ public class K8sController {
         model.addAttribute("containers", pod.getSpec().getContainers());
         model.addAttribute("logs", logs);
 
-        return "tools/k8s/log-viewer";
+        return "tools/k8s/logs";
     }
 }
